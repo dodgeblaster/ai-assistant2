@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="style.css" />
+
+        <script
+            type="module"
+            src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@2/dist/zero-md.min.js"
+        ></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <nav>
+                <h1>AI Assistant</h1>
+
+                <div class="strategies">
+                    <button id="strategy-js" class="selected">js</button>
+                    <button id="strategy-rust">rust</button>
+                    <button id="strategy-rephrase">rephrase</button>
+                    <button id="strategy-idea">idea</button>
+                    <button id="strategy-any">any</button>
+                </div>
+
+                <button id="mode-aws" class="selected">AWS</button>
+                <button id="mode-local">LOCAL</button>
+            </nav>
+            <div class="chat-container">
+                <my-chat id="chat"></my-chat>
+            </div>
+        </div>
+    </body>
+    <script type="module">
+        import '/chat.js'
+
+        // MODE TOGGLE
+        let mode = 'aws'
+
+        const awsButton = document.getElementById('mode-aws')
+        const localButton = document.getElementById('mode-local')
+        awsButton.addEventListener('click', () => {
+            awsButton.className = 'selected'
+            localButton.className = ''
+            mode = 'aws'
+        })
+        localButton.addEventListener('click', () => {
+            awsButton.className = ''
+            localButton.className = 'selected'
+            mode = 'local'
+        })
+
+        // STRATEGY TOGGLE
+        let strategy = 'js'
+        const jsButton = document.getElementById('strategy-js')
+        const rustButton = document.getElementById('strategy-rust')
+        const rephraseButton = document.getElementById('strategy-rephrase')
+        const ideaButton = document.getElementById('strategy-idea')
+        const anyButton = document.getElementById('strategy-any')
+        jsButton.addEventListener('click', () => {
+            jsButton.className = 'selected'
+            rustButton.className = ''
+            rephraseButton.className = ''
+            ideaButton.className = ''
+            anyButton.className = ''
+            strategy = 'js'
+        })
+
+        rustButton.addEventListener('click', () => {
+            jsButton.className = ''
+            rustButton.className = 'selected'
+            rephraseButton.className = ''
+            ideaButton.className = ''
+            anyButton.className = ''
+            strategy = 'rust'
+        })
+
+        rephraseButton.addEventListener('click', () => {
+            jsButton.className = ''
+            rustButton.className = ''
+            rephraseButton.className = 'selected'
+            ideaButton.className = ''
+            anyButton.className = ''
+            strategy = 'rephrase'
+        })
+
+        ideaButton.addEventListener('click', () => {
+            jsButton.className = ''
+            rustButton.className = ''
+            rephraseButton.className = ''
+            ideaButton.className = 'selected'
+            anyButton.className = ''
+            strategy = 'idea'
+        })
+
+        anyButton.addEventListener('click', () => {
+            jsButton.className = ''
+            rustButton.className = ''
+            rephraseButton.className = ''
+            ideaButton.className = ''
+            anyButton.className = 'selected'
+            strategy = 'any'
+        })
+        // API
+        const chat = document.getElementById('chat')
+
+        chat.addEventListener('submit', (e) => {
+            const v = e.detail.value
+
+            fetch('http://localhost:3001/submit', {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({
+                    question: v,
+                    mode: mode,
+                    strategy
+                })
+            })
+                .then((x) => x.json())
+                .then((x) => {
+                    chat.addMessage('actor-ai', x.answer, x.time)
+                })
+                .catch((e) => {
+                    chat.addMessage('actor-ai', e.message)
+                })
+        })
+    </script>
+</html>
